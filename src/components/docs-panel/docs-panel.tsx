@@ -161,9 +161,14 @@ class CombinedLearningJourneyPanel extends SceneObjectBase<CombinedPanelState> i
     ];
 
     const contextPanel = new ContextPanel(
-      (url: string, title: string) => this.openLearningJourney(url, title),
-      (url: string, title: string, packageInfo?: PackageOpenInfo) =>
-        this.openDocsPage(url, title, undefined, packageInfo),
+      (url: string, title: string) => {
+        this._recordAutoLaunchSource('recommender');
+        this.openLearningJourney(url, title);
+      },
+      (url: string, title: string, packageInfo?: PackageOpenInfo) => {
+        this._recordAutoLaunchSource('recommender');
+        this.openDocsPage(url, title, undefined, packageInfo);
+      },
       () => this.openEditorTab()
     );
 
