@@ -764,7 +764,9 @@ class CombinedLearningJourneyPanel extends SceneObjectBase<CombinedPanelState> i
 
     try {
       const launchSource = this._consumeAutoLaunchSource();
-      const packageInfo = packageInfoArg ?? this.state.tabs.find((t) => t.id === tabId)?.packageInfo;
+      const existingTab = this.state.tabs.find((t) => t.id === tabId);
+      const packageInfo = packageInfoArg ?? existingTab?.packageInfo;
+      const guideTitle = existingTab?.title ?? '';
       const result = await loadDocsTabContentResult(url, { skipReadyToBegin, packageInfo });
 
       // Check if fetch succeeded or failed
@@ -820,7 +822,7 @@ class CombinedLearningJourneyPanel extends SceneObjectBase<CombinedPanelState> i
         if (pendingAlignment) {
           reportAppInteraction(UserInteraction.AlignmentPromptShown, {
             guide_url: url,
-            guide_title: this.state.tabs.find((t) => t.id === tabId)?.title ?? '',
+            guide_title: guideTitle,
             launch_source: pendingAlignment.launchSource,
             current_path: pendingAlignment.currentPath,
             starting_location: pendingAlignment.startingLocation,
