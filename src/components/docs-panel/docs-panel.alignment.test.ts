@@ -13,6 +13,7 @@
 // ---------------------------------------------------------------------------
 
 const mockLoadDocsTabContentResult = jest.fn();
+const mockFetchContent = jest.fn();
 const mockLocationServicePush = jest.fn();
 const mockGetLocation = jest.fn(() => ({ pathname: '/explore', search: '' }));
 const mockReportAppInteraction = jest.fn();
@@ -67,7 +68,7 @@ jest.mock('./context-panel', () => ({
 }));
 
 jest.mock('../../docs-retrieval', () => ({
-  fetchContent: jest.fn(),
+  fetchContent: (...args: unknown[]) => mockFetchContent(...args),
   ContentRenderer: jest.fn(),
   getNextMilestoneUrlFromContent: jest.fn(),
   getPreviousMilestoneUrlFromContent: jest.fn(),
@@ -454,6 +455,25 @@ describe('CombinedLearningJourneyPanel — implied-0th-step alignment', () => {
       const secondTab = getTab(panel, secondTabId);
       if (secondTab.pendingAlignment) {
         expect(secondTab.pendingAlignment.launchSource).toBe('unknown');
+      }
+    });
+
+    it('clears _pendingLaunchSource when opening a learning journey', async () => {
+      mockLoadDocsTabContentResult.mockResolvedValue(makeContentResult({ startingLocation: '/connections' }));
+      mockFetchContent.mockResolvedValue({ content: { content: [], metadata: {} } });
+      const panel = new CombinedLearningJourneyPanel();
+
+      panel._recordAutoLaunchSource('home_page');
+      await panel.openLearningJourney('https://grafana.com/learning-journeys/example', 'Learning path');
+
+      const tabId = await panel.openDocsPage('bundled:connections-guide', 'Test Guide', undefined, {
+        packageManifest: { startingLocation: '/connections' },
+      });
+      await new Promise((r) => setTimeout(r, 0));
+
+      const tab = getTab(panel, tabId);
+      if (tab.pendingAlignment) {
+        expect(tab.pendingAlignment.launchSource).toBe('unknown');
       }
     });
   });

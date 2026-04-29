@@ -9,6 +9,11 @@ describe('pathMatchesStartingLocation', () => {
     expect(pathMatchesStartingLocation('/connections/datasources', '/connections')).toBe(true);
   });
 
+  it('returns false when currentPath only has a substring match', () => {
+    expect(pathMatchesStartingLocation('/connections-new', '/connections')).toBe(false);
+    expect(pathMatchesStartingLocation('/explore/metrics', '/metrics')).toBe(false);
+  });
+
   it('returns false for a non-matching path', () => {
     expect(pathMatchesStartingLocation('/explore', '/connections')).toBe(false);
   });

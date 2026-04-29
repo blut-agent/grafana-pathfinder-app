@@ -30,14 +30,16 @@ export interface EvaluateAlignmentInput {
 /**
  * True when `currentPath` satisfies a guide that declares `startingLocation`.
  *
- * Mirrors `onPageCheck` semantics in
- * `src/requirements-manager/checks/location.ts`: a path is aligned if it is
- * an exact match OR contains the starting location as a substring. Keeping
- * the rule consistent ensures step 1's `on-page` requirement (if declared)
- * also passes once we navigate.
+ * A path is aligned when it is an exact match or a child path of the starting
+ * location. This intentionally checks segment boundaries instead of substring
+ * matches so `/connections-new` does not satisfy `/connections`.
  */
 export function pathMatchesStartingLocation(currentPath: string, startingLocation: string): boolean {
-  return currentPath === startingLocation || currentPath.includes(startingLocation);
+  if (startingLocation === '/') {
+    return currentPath === '/';
+  }
+
+  return currentPath === startingLocation || currentPath.startsWith(`${startingLocation}/`);
 }
 
 export function evaluateAlignment(input: EvaluateAlignmentInput): AlignmentEvaluation {

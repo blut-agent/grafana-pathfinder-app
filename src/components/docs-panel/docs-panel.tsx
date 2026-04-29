@@ -127,8 +127,9 @@ class CombinedLearningJourneyPanel extends SceneObjectBase<CombinedPanelState> i
    * Transient launch-source carrier for the implied-0th-step alignment check.
    * Listeners (`handleAutoLaunchTutorial`, `handleAutoOpen`) set this
    * immediately before calling `openDocsPage`/`openLearningJourney`;
-   * `loadDocsTabContent` consumes it. Mirrors the consume-once pattern in
-   * `sidebarState.consumePendingOpenSource`.
+   * `loadDocsTabContent` consumes it for docs tabs, while learning journey opens
+   * clear it because they do not run alignment. Mirrors the consume-once pattern
+   * in `sidebarState.consumePendingOpenSource`.
    */
   private _pendingLaunchSource: string | null = null;
 
@@ -259,6 +260,8 @@ class CombinedLearningJourneyPanel extends SceneObjectBase<CombinedPanelState> i
   }
 
   public async openLearningJourney(url: string, title?: string): Promise<string> {
+    this._consumeAutoLaunchSource();
+
     const finalTitle = title || 'Learning path';
     const tabId = this.generateTabId();
 
