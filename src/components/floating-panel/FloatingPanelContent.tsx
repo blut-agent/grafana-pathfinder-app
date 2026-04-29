@@ -60,13 +60,15 @@ export function FloatingPanelContent({
           />
         </div>
       )}
-      <ContentRenderer
-        key={content.url}
-        content={content}
-        containerRef={contentRef}
-        className={contentClassName}
-        onGuideComplete={onGuideComplete}
-      />
+      {!pendingAlignment && (
+        <ContentRenderer
+          key={content.url}
+          content={content}
+          containerRef={contentRef}
+          className={contentClassName}
+          onGuideComplete={onGuideComplete}
+        />
+      )}
     </div>
   );
 }

@@ -2253,39 +2253,41 @@ function CombinedPanelRendererInner({ model }: SceneComponentProps<CombinedLearn
                           }}
                         />
                       )}
-                      <ContentRenderer
-                        key={activeTab?.currentUrl || stableContent.url}
-                        content={stableContent}
-                        containerRef={contentRef}
-                        className={`${
-                          stableContent.type === 'learning-journey' ? journeyStyles : docsStyles
-                        } ${interactiveStyles} ${prismStyles}`}
-                        onContentReady={() => {
-                          // Restore scroll position after content is ready
-                          restoreScrollPosition();
-                        }}
-                        onGuideComplete={() => {
-                          const baseUrl = activeTab?.baseUrl || stableContent.url;
+                      {!activeTab?.pendingAlignment && (
+                        <ContentRenderer
+                          key={activeTab?.currentUrl || stableContent.url}
+                          content={stableContent}
+                          containerRef={contentRef}
+                          className={`${
+                            stableContent.type === 'learning-journey' ? journeyStyles : docsStyles
+                          } ${interactiveStyles} ${prismStyles}`}
+                          onContentReady={() => {
+                            // Restore scroll position after content is ready
+                            restoreScrollPosition();
+                          }}
+                          onGuideComplete={() => {
+                            const baseUrl = activeTab?.baseUrl || stableContent.url;
 
-                          // Mark bundled guides as 100% complete when all interactive steps finish
-                          if (baseUrl?.startsWith('bundled:')) {
-                            setJourneyCompletionPercentage(baseUrl, 100);
-                          }
-
-                          // Mark learning journey milestones as done when all interactive steps finish
-                          if (stableContent.type === 'learning-journey' && activeTab?.currentUrl) {
-                            const slug = getMilestoneSlug(activeTab.currentUrl);
-                            const journeyBase = activeTab.baseUrl;
-                            if (slug && journeyBase) {
-                              markMilestoneDone(
-                                journeyBase,
-                                slug,
-                                stableContent.metadata?.learningJourney?.totalMilestones
-                              );
+                            // Mark bundled guides as 100% complete when all interactive steps finish
+                            if (baseUrl?.startsWith('bundled:')) {
+                              setJourneyCompletionPercentage(baseUrl, 100);
                             }
-                          }
-                        }}
-                      />
+
+                            // Mark learning journey milestones as done when all interactive steps finish
+                            if (stableContent.type === 'learning-journey' && activeTab?.currentUrl) {
+                              const slug = getMilestoneSlug(activeTab.currentUrl);
+                              const journeyBase = activeTab.baseUrl;
+                              if (slug && journeyBase) {
+                                markMilestoneDone(
+                                  journeyBase,
+                                  slug,
+                                  stableContent.metadata?.learningJourney?.totalMilestones
+                                );
+                              }
+                            }
+                          }}
+                        />
+                      )}
                     </>
                   )}
 
