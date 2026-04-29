@@ -95,6 +95,7 @@ function FloatingPanelInner() {
     const pendingGuide = panelModeManager.consumePendingGuide();
     if (pendingGuide) {
       guideOpenInFlightRef.current = true;
+      panel._recordAutoLaunchSource('floating_panel_dock');
       panel.openDocsPage(pendingGuide.url, pendingGuide.title);
     }
 
