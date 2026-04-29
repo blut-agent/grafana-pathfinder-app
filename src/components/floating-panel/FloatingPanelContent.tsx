@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { ContentRenderer } from '../../docs-retrieval';
 import { journeyContentHtml, docsContentHtml } from '../../styles/content-html.styles';
@@ -41,6 +41,15 @@ export function FloatingPanelContent({
   const docsStyles = useStyles2(docsContentHtml);
   const interactiveStyles = useStyles2(getInteractiveStyles);
   const prismStyles = useStyles2(getPrismStyles);
+  const isAlignmentPending = !!pendingAlignment;
+  const alignmentStartingLocation = pendingAlignment?.startingLocation ?? null;
+  const alignmentPendingContextValue = useMemo(
+    () => ({
+      isPending: isAlignmentPending,
+      startingLocation: alignmentStartingLocation,
+    }),
+    [isAlignmentPending, alignmentStartingLocation]
+  );
 
   if (!content) {
     return (
@@ -51,12 +60,7 @@ export function FloatingPanelContent({
   const contentClassName = `${content.type === 'learning-journey' ? journeyStyles : docsStyles} ${interactiveStyles} ${prismStyles}`;
 
   return (
-    <AlignmentPendingContext.Provider
-      value={{
-        isPending: !!pendingAlignment,
-        startingLocation: pendingAlignment?.startingLocation ?? null,
-      }}
-    >
+    <AlignmentPendingContext.Provider value={alignmentPendingContextValue}>
       <div ref={contentRef}>
         {pendingAlignment && onAlignmentConfirm && onAlignmentCancel && (
           <div style={{ padding: 16 }}>

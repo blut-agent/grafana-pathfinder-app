@@ -1133,6 +1133,15 @@ function CombinedPanelRendererInner({ model }: SceneComponentProps<CombinedLearn
   // STABILITY: Memoize activeTab.content to prevent ContentRenderer from remounting
   // when other tab properties change (isLoading, error, etc.)
   const stableContent = React.useMemo(() => activeTab?.content, [activeTab?.content]);
+  const isAlignmentPending = !!activeTab?.pendingAlignment;
+  const alignmentStartingLocation = activeTab?.pendingAlignment?.startingLocation ?? null;
+  const alignmentPendingContextValue = React.useMemo(
+    () => ({
+      isPending: isAlignmentPending,
+      startingLocation: alignmentStartingLocation,
+    }),
+    [isAlignmentPending, alignmentStartingLocation]
+  );
 
   // Check for interactive progress when content changes to show reset button
   // MUST use currentUrl || baseUrl (not content.url) to match getContentKey() in interactive sections.
@@ -2336,12 +2345,7 @@ function CombinedPanelRendererInner({ model }: SceneComponentProps<CombinedLearn
                   }}
                 >
                   {stableContent && (
-                    <AlignmentPendingContext.Provider
-                      value={{
-                        isPending: !!activeTab?.pendingAlignment,
-                        startingLocation: activeTab?.pendingAlignment?.startingLocation ?? null,
-                      }}
-                    >
+                    <AlignmentPendingContext.Provider value={alignmentPendingContextValue}>
                       {activeTab?.pendingAlignment && (
                         <AlignmentPrompt
                           startingLocation={activeTab.pendingAlignment.startingLocation}
