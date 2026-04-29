@@ -320,11 +320,12 @@ jobs:
 
       - name: docker run grafana/pathfinder-cli:<version> --version
         env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -z "${DOCKERHUB_TOKEN:-}" ]; then
-            echo "DOCKERHUB_TOKEN absent — Docker Hub publish was skipped, nothing to smoke."
+          if [ -z "${DOCKERHUB_USERNAME:-}" ] || [ -z "${DOCKERHUB_TOKEN:-}" ]; then
+            echo "DOCKERHUB_USERNAME / DOCKERHUB_TOKEN absent — Docker Hub publish was skipped, nothing to smoke."
             exit 0
           fi
           version="${{ needs.build.outputs.schema-version }}"
