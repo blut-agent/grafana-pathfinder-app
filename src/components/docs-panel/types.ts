@@ -59,6 +59,9 @@ export interface DocsPanelModelOperations {
 
   /** Get the currently active tab */
   getActiveTab(): LearningJourneyTab | null;
+
+  /** Re-evaluate alignment for a tab on a location change */
+  reevaluateAlignment(tabId: string, currentPath: string): void;
 }
 
 /**
