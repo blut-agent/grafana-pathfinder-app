@@ -246,6 +246,7 @@ jest.mock(
 // ---------------------------------------------------------------------------
 
 import { CombinedLearningJourneyPanel } from './docs-panel';
+import { restoreActiveTabFromStorage, restoreTabsFromStorage, shouldUseDocsLoader } from './utils';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -329,6 +330,42 @@ describe('CombinedLearningJourneyPanel — implied-0th-step alignment', () => {
       await new Promise((r) => setTimeout(r, 0));
 
       expect(getTab(panel, tabId).pendingAlignment).toBeUndefined();
+    });
+
+    it('does NOT set pendingAlignment when a restored active tab loads after browser restore', async () => {
+      mockLoadDocsTabContentResult.mockResolvedValue(makeContentResult({ startingLocation: '/connections' }));
+      (shouldUseDocsLoader as jest.Mock).mockReturnValue(true);
+      (restoreTabsFromStorage as jest.Mock).mockResolvedValue([
+        {
+          id: 'recommendations',
+          title: 'Recommendations',
+          baseUrl: '',
+          currentUrl: '',
+          content: null,
+          isLoading: false,
+          error: null,
+        },
+        {
+          id: 'tab-restored',
+          title: 'Restored guide',
+          baseUrl: 'bundled:connections-guide',
+          currentUrl: 'bundled:connections-guide',
+          content: null,
+          isLoading: false,
+          error: null,
+          type: 'interactive',
+          packageInfo: {
+            packageManifest: { startingLocation: '/connections' },
+          },
+        },
+      ]);
+      (restoreActiveTabFromStorage as jest.Mock).mockResolvedValue('tab-restored');
+      const panel = new CombinedLearningJourneyPanel();
+
+      await panel.restoreTabsAsync();
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(getTab(panel, 'tab-restored').pendingAlignment).toBeUndefined();
     });
 
     it('does NOT set pendingAlignment when source is mcp_launch', async () => {

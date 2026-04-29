@@ -221,6 +221,7 @@ class CombinedLearningJourneyPanel extends SceneObjectBase<CombinedPanelState> i
 
     if (!activeTab.content && !activeTab.isLoading && !activeTab.error) {
       if (shouldUseDocsLoader(activeTab)) {
+        this._recordAutoLaunchSource('browser_restore');
         this.loadDocsTabContent(activeTab.id, activeTab.currentUrl || activeTab.baseUrl);
       } else {
         this.loadTabContent(activeTab.id, activeTab.currentUrl || activeTab.baseUrl);
