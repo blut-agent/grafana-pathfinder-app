@@ -32,10 +32,14 @@ export function resolveStartingLocation(url: string, packageManifest?: Record<st
   }
 
   if (url.startsWith(BUNDLED_PREFIX)) {
-    return resolveFromBundledIndex(url.slice(BUNDLED_PREFIX.length));
+    return resolveFromBundledIndex(extractBundledId(url.slice(BUNDLED_PREFIX.length)));
   }
 
   return null;
+}
+
+function extractBundledId(idOrPath: string): string {
+  return idOrPath.split('/')[0];
 }
 
 function resolveFromBundledIndex(id: string): string | null {

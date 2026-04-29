@@ -26,6 +26,11 @@ describe('resolveStartingLocation', () => {
     expect(result).toBe('/explore');
   });
 
+  it('falls through to the bundled index when the bundled URL includes a content path', () => {
+    const result = resolveStartingLocation('bundled:array-shape/content.json', {});
+    expect(result).toBe('/explore');
+  });
+
   it('returns the first URL from a bundled entry that has an array', () => {
     expect(resolveStartingLocation('bundled:array-shape')).toBe('/explore');
   });
