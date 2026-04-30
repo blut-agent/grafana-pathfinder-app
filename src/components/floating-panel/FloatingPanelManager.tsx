@@ -8,6 +8,7 @@ import { sidebarState } from '../../global-state/sidebar';
 import { getConfigWithDefaults } from '../../constants';
 import { reportAppInteraction, UserInteraction } from '../../lib/analytics';
 import { interactiveStepStorage } from '../../lib/user-storage';
+import { getMilestoneSlug, markMilestoneDone, setJourneyCompletionPercentage } from '../../docs-retrieval';
 import { FloatingPanel } from './FloatingPanel';
 import { FloatingPanelContent } from './FloatingPanelContent';
 import { SkeletonLoader } from '../SkeletonLoader';
@@ -262,6 +263,25 @@ function FloatingPanelInner() {
     panelModeManager.setMode('sidebar');
   }, []);
 
+  const handleGuideComplete = useCallback(() => {
+    if (!content) {
+      return;
+    }
+
+    const baseUrl = activeTab?.baseUrl || content.url;
+    if (baseUrl?.startsWith('bundled:')) {
+      setJourneyCompletionPercentage(baseUrl, 100);
+    }
+
+    if (content.type === 'learning-journey' && activeTab?.currentUrl) {
+      const slug = getMilestoneSlug(activeTab.currentUrl);
+      const journeyBase = activeTab.baseUrl;
+      if (slug && journeyBase) {
+        markMilestoneDone(journeyBase, slug, content.metadata?.learningJourney?.totalMilestones);
+      }
+    }
+  }, [activeTab?.baseUrl, activeTab?.currentUrl, content]);
+
   return (
     <FloatingPanel
       title={title}
@@ -278,6 +298,7 @@ function FloatingPanelInner() {
       ) : (
         <FloatingPanelContent
           content={content}
+          onGuideComplete={handleGuideComplete}
           pendingAlignment={activeTab?.pendingAlignment}
           onAlignmentConfirm={activeTab ? () => void panel.confirmAlignment(activeTab.id) : undefined}
           onAlignmentCancel={activeTab ? () => panel.dismissAlignment(activeTab.id) : undefined}
